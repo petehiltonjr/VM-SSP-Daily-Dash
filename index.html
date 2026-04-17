@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viamedia SSP Daily Dash</title>
+<title>LFG Spend Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -146,7 +146,7 @@ tbody tr:last-child td { border-bottom: none; }
 
 <div class="header">
   <div class="header-left">
-    <div class="logo">Viamedia SSP Daily Dash</div>
+    <div class="logo"><span>LFG</span> Spend Dashboard</div>
     <div class="data-badge"><span class="dot"></span> Live data</div>
   </div>
   <div class="header-right mono" id="asof"></div>
@@ -167,7 +167,14 @@ const fmt = v => '$' + Math.round(v).toLocaleString();
 const fmtS = v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'k' : '$' + Math.round(v);
 const shortD = d => { const p = d.split('-'); return p[1].replace(/^0/,'') + '/' + p[2].replace(/^0/,''); };
 
-document.getElementById('asof').textContent = 'Data through Apr 8, 2026 · Prototype';
+
+fetch('https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json?t='+Date.now())
+  .then(r=>r.json()).then(d=>{
+    document.getElementById('asof').textContent='Through '+d.max_date+' · Updated '+d.generated_at;
+    const m=document.querySelector('#page-Overview .metrics');
+    if(m) m.innerHTML='<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$'+Math.round(d.total_spend).toLocaleString()+'</div><div class="mc-sub">All platforms</div></div><div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">'+d.active_deals+'</div><div class="mc-sub">Spend in last 7 days</div></div><div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">'+d.flagged_deals+'</div><div class="mc-sub">Stopped or declining</div></div><div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">'+d.opportunity_deals+'</div><div class="mc-sub">Growing week-over-week</div></div>';
+  }).catch(e=>console.error(e));
+
 
 const SELLERS = ['Overview','Yelena','Matt','Ken','Allison','Dan','Meghan','Allegra','Jordana','Unassigned'];
 const tabBar = document.getElementById('tabBar');
