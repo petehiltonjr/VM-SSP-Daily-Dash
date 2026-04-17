@@ -167,7 +167,12 @@ const fmt = v => '$' + Math.round(v).toLocaleString();
 const fmtS = v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'k' : '$' + Math.round(v);
 const shortD = d => { const p = d.split('-'); return p[1].replace(/^0/,'') + '/' + p[2].replace(/^0/,''); };
 
-document.getElementById('asof').textContent = 'Data through Apr 8, 2026 · Prototype';
+
+fetch('https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json?t='+Date.now())
+  .then(r=>r.json()).then(d=>{
+    document.getElementById('asof').textContent='Through '+d.max_date+' · Updated '+d.generated_at;
+  }).catch(()=>{});
+
 
 const SELLERS = ['Overview','Yelena','Matt','Ken','Allison','Dan','Meghan','Allegra','Jordana','Unassigned'];
 const tabBar = document.getElementById('tabBar');
