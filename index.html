@@ -156,6 +156,9 @@ tbody tr:last-child td { border-bottom: none; }
 <div id="tabContents"></div>
 
 <script>
+const DATA_URL='https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json';
+async function init(){try{const r=await fetch(DATA_URL+'?t='+Date.now());const d=await r.json();document.getElementById('asof').textContent='Through '+d.max_date+' \u00b7 Updated '+d.generated_at;const m=document.querySelector('#page-Overview .metrics');if(m)m.innerHTML='<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$'+Math.round(d.total_spend).toLocaleString()+'</div><div class="mc-sub">All platforms</div></div><div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">'+d.active_deals+'</div><div class="mc-sub">Spend in last 7 days</div></div><div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">'+d.flagged_deals+'</div><div class="mc-sub">Stopped or declining</div></div><div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">'+d.opportunity_deals+'</div><div class="mc-sub">Growing week-over-week</div></div>';}catch(e){console.error(e);}}
+
 const PLAT_COLORS = {OpenX:'#4f7cff',Equativ:'#3ecf8e','Magnite Curate':'#f5a623','Magnite Streaming':'#c084fc',Xandr:'#fb923c'};
 const PLAT_TOTALS = {OpenX:130863,Equativ:50151,'Magnite Curate':1727,'Magnite Streaming':7336,Xandr:703};
 const DATES = ["2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-14","2026-03-15","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-03","2026-04-04","2026-04-05","2026-04-06","2026-04-07","2026-04-08"];
