@@ -338,6 +338,34 @@ ovDiv.innerHTML = `
   </div>
   <div class="sec">Deal status</div>`;
 
+
+// Report status section
+fetch('https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json?t='+Date.now())
+  .then(r=>r.json()).then(d=>{
+    const rs = d.report_status || {};
+    const sources = ['OpenX','Equativ','Magnite Curate','Magnite Streaming','Xandr','PubMatic'];
+    const container = document.querySelector('#page-Overview');
+    if(!container) return;
+    const rsDiv = document.createElement('div');
+    rsDiv.style.cssText = 'margin-bottom:20px;';
+    const title = document.createElement('div');
+    title.className = 'sec';
+    title.textContent = 'Daily report status';
+    rsDiv.appendChild(title);
+    const grid = document.createElement('div');
+    grid.className = 'status-grid';
+    sources.forEach(src => {
+      const info = rs[src] || {status:'MISSING',last_received:'Never'};
+      const st = info.status.toLowerCase();
+      const card = document.createElement('div');
+      card.className = 'status-card ' + st;
+      card.innerHTML = '<div class="status-dot '+st+'"></div><div><div class="status-name">'+src+'</div><div class="status-date">Last: '+info.last_received+'</div></div><span class="status-badge '+st+'">'+info.status+'</span>';
+      grid.appendChild(card);
+    });
+    rsDiv.appendChild(grid);
+    container.insertBefore(rsDiv, container.firstChild);
+  }).catch(e=>console.error(e));
+
 const allDeals = Object.values(SELLER_DATA).flatMap(s => s.deals);
 const allFlags = {};
 allDeals.forEach(d => { allFlags[d.flag] = (allFlags[d.flag]||0)+1; });
