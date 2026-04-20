@@ -7,135 +7,83 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0f1117;
-  --surface: #181b24;
-  --surface2: #1e2130;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --text: #e8eaf0;
-  --text2: #8b90a0;
-  --text3: #555b6e;
-  --accent: #4f7cff;
-  --green: #3ecf8e;
-  --amber: #f5a623;
-  --red: #f04444;
-  --openx: #4f7cff;
-  --equativ: #3ecf8e;
-  --mag-curate: #f5a623;
-  --mag-stream: #c084fc;
-  --xandr: #fb923c;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.5; min-height: 100vh; }
-.mono { font-family: 'DM Mono', monospace; }
-
-/* Header */
-.header { border-bottom: 1px solid var(--border); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 100; }
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; color: var(--text); text-transform: uppercase; }
-.logo span { color: var(--accent); }
-.header-right { font-size: 11px; color: var(--text3); }
-.data-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-/* Tabs */
-.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 24px; overflow-x: auto; background: var(--bg); position: sticky; top: 52px; z-index: 99; }
-.tab { font-size: 12px; padding: 10px 16px; cursor: pointer; color: var(--text3); border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
-.tab:hover { color: var(--text2); }
-.tab.active { color: var(--text); border-bottom-color: var(--accent); }
-
-/* Layout */
-.page { display: none; padding: 20px 24px; }
-.page.active { display: block; }
-.metrics { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 20px; }
-.metrics-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 20px; }
-.mc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-.mc-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.mc-val { font-size: 24px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
-.mc-sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
-.mc-val.danger { color: var(--red); }
-.mc-val.success { color: var(--green); }
-
-/* Chart area */
-.chart-grid { display: grid; grid-template-columns: 1fr 200px; gap: 16px; margin-bottom: 20px; }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-.chart-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 12px; }
-.chart-wrap { position: relative; height: 160px; }
-.legend { display: flex; flex-direction: column; gap: 8px; }
-.leg { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text2); }
-.leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-.plat-bars { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
-.pb-row { }
-.pb-top { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px; color: var(--text2); }
-.pb-bg { height: 3px; background: var(--surface2); border-radius: 2px; }
-.pb-fill { height: 3px; border-radius: 2px; transition: width 0.4s ease; }
-
-/* Flag bar */
-.flag-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.fc { flex: 1; min-width: 90px; padding: 10px 14px; border-radius: 8px; border: 1px solid; }
-.fc-stopped { background: rgba(240,68,68,0.08); border-color: rgba(240,68,68,0.2); color: #f87171; }
-.fc-declining { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.2); color: #fbbf24; }
-.fc-growing { background: rgba(62,207,142,0.08); border-color: rgba(62,207,142,0.2); color: var(--green); }
-.fc-stable { background: var(--surface); border-color: var(--border); color: var(--text2); }
-.fc-num { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; }
-.fc-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; opacity: 0.8; }
-
-/* Filters */
-.filter-bar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-.fb { font-size: 11px; padding: 4px 12px; border: 1px solid var(--border2); border-radius: 20px; background: transparent; color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; }
-.fb:hover { border-color: var(--accent); color: var(--text); }
-.fb.active { background: rgba(79,124,255,0.15); color: var(--accent); border-color: var(--accent); }
-.search-wrap { flex: 1; min-width: 160px; }
-.search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 11px; padding: 5px 10px; height: 28px; outline: none; }
-.search-wrap input:focus { border-color: var(--accent); }
-.search-wrap input::placeholder { color: var(--text3); }
-
-/* Table */
-.tbl-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-height: 420px; overflow-y: auto; }
-.tbl-wrap::-webkit-scrollbar { width: 4px; }
-.tbl-wrap::-webkit-scrollbar-track { background: var(--surface); }
-.tbl-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
-thead th { font-size: 9px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface2); position: sticky; top: 0; white-space: nowrap; z-index: 1; }
-tbody td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; background: var(--surface); }
-tbody tr:hover td { background: var(--surface2); cursor: pointer; }
-tbody tr:last-child td { border-bottom: none; }
-.dn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 0; font-family: 'DM Mono', monospace; font-size: 10px; }
-.badge { display: inline-flex; align-items: center; font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 500; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
-.b-stopped { background: rgba(240,68,68,0.12); color: #f87171; }
-.b-declining { background: rgba(245,166,35,0.12); color: #fbbf24; }
-.b-growing { background: rgba(62,207,142,0.12); color: var(--green); }
-.b-stable { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
-.tu { color: var(--green); font-size: 10px; font-family: 'DM Mono', monospace; }
-.td { color: var(--red); font-size: 10px; font-family: 'DM Mono', monospace; }
-.tn { color: var(--text3); font-size: 10px; }
-.pt { display: inline-block; font-size: 8px; padding: 1px 5px; border-radius: 3px; margin-right: 2px; background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
-
-/* Detail row */
-.dr td { background: var(--surface2) !important; padding: 12px 14px; font-size: 11px; }
-.di { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.dl { font-weight: 500; color: var(--text2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-.dv { color: var(--text); line-height: 1.5; }
-.dv-empty { color: var(--text3); font-style: italic; }
-.dv-week { font-size: 10px; color: var(--text3); margin-top: 4px; }
-.dmeta { display: flex; gap: 20px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-.dmeta-item .dl { margin-bottom: 2px; }
-
-/* Seller pill */
-.seller-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.seller-name { font-size: 18px; font-weight: 600; color: var(--text); }
-.seller-meta { font-size: 11px; color: var(--text3); }
-.seller-meta span { color: var(--text2); }
-
-/* No results */
-.no-r { padding: 32px; text-align: center; color: var(--text3); background: var(--surface); }
-
-/* Section label */
-.sec { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-
-
+:root{--bg:#0f1117;--surface:#181b24;--surface2:#1e2130;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e8eaf0;--text2:#8b90a0;--text3:#555b6e;--accent:#4f7cff;--green:#3ecf8e;--red:#f04444;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;font-size:13px;line-height:1.5;min-height:100vh;}
+.mono{font-family:"DM Mono",monospace;}
+.header{border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100;}
+.logo{font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);}
+.data-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 8px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.tabs{display:flex;border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto;background:var(--bg);position:sticky;top:52px;z-index:99;}
+.tab{font-size:12px;padding:10px 16px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;}
+.tab.active{color:var(--text);border-bottom-color:var(--accent);}
+.page{display:none;padding:20px 24px;}.page.active{display:block;}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px;}
+.metrics-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:20px;}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.mc-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.mc-val{font-size:24px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace;}
+.mc-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.mc-val.danger{color:var(--red);}.mc-val.success{color:var(--green);}
+.chart-grid{display:grid;grid-template-columns:1fr 200px;gap:16px;margin-bottom:20px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.chart-title{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;}
+.chart-wrap{position:relative;height:160px;}
+.legend{display:flex;flex-direction:column;gap:8px;}
+.leg{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2);}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.plat-bars{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.pb-top{display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px;color:var(--text2);}
+.pb-bg{height:3px;background:var(--surface2);border-radius:2px;}
+.pb-fill{height:3px;border-radius:2px;}
+.flag-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.fc{flex:1;min-width:90px;padding:10px 14px;border-radius:8px;border:1px solid;}
+.fc-stopped{background:rgba(240,68,68,0.08);border-color:rgba(240,68,68,0.2);color:#f87171;}
+.fc-declining{background:rgba(245,166,35,0.08);border-color:rgba(245,166,35,0.2);color:#fbbf24;}
+.fc-growing{background:rgba(62,207,142,0.08);border-color:rgba(62,207,142,0.2);color:var(--green);}
+.fc-stable{background:var(--surface);border-color:var(--border);color:var(--text2);}
+.fc-num{font-size:20px;font-weight:600;font-family:"DM Mono",monospace;}
+.fc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;opacity:0.8;}
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.fb{font-size:11px;padding:4px 12px;border:1px solid var(--border2);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;}
+.fb.active{background:rgba(79,124,255,0.15);color:var(--accent);border-color:var(--accent);}
+.search-wrap{flex:1;min-width:160px;}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;font-size:11px;padding:5px 10px;height:28px;outline:none;}
+.tbl-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:420px;overflow-y:auto;}
+.tbl-wrap::-webkit-scrollbar{width:4px;}
+.tbl-wrap::-webkit-scrollbar-track{background:var(--surface);}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
+thead th{font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2);position:sticky;top:0;white-space:nowrap;z-index:1;}
+tbody td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;background:var(--surface);}
+tbody tr:hover td{background:var(--surface2);cursor:pointer;}
+tbody tr:last-child td{border-bottom:none;}
+.dn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;font-family:"DM Mono",monospace;font-size:10px;}
+.badge{display:inline-flex;align-items:center;font-size:9px;padding:2px 6px;border-radius:6px;font-weight:500;white-space:nowrap;}
+.b-stopped{background:rgba(240,68,68,0.12);color:#f87171;}
+.b-declining{background:rgba(245,166,35,0.12);color:#fbbf24;}
+.b-growing{background:rgba(62,207,142,0.12);color:var(--green);}
+.b-stable{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.tu{color:var(--green);font-size:10px;font-family:"DM Mono",monospace;}
+.td2{color:var(--red);font-size:10px;font-family:"DM Mono",monospace;}
+.tn{color:var(--text3);font-size:10px;}
+.pt{display:inline-block;font-size:8px;padding:1px 5px;border-radius:3px;margin-right:2px;background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.dr td{background:var(--surface2)!important;padding:12px 14px;font-size:11px;}
+.di{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.dl{font-weight:500;color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.dv{color:var(--text);line-height:1.5;}
+.dv-empty{color:var(--text3);font-style:italic;}
+.dv-week{font-size:10px;color:var(--text3);margin-top:4px;}
+.dmeta{display:flex;gap:20px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.seller-header{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.seller-name{font-size:18px;font-weight:600;color:var(--text);}
+.seller-meta{font-size:11px;color:var(--text3);}
+.seller-meta span{color:var(--text2);}
+.no-r{padding:32px;text-align:center;color:var(--text3);background:var(--surface);}
+.sec{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.loading{padding:40px;text-align:center;color:var(--text3);}
 .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:20px;}
 .status-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
 .status-card.ok{border-left:3px solid var(--green);}
@@ -151,291 +99,217 @@ tbody tr:last-child td { border-bottom: none; }
 .status-badge.ok{background:rgba(62,207,142,0.12);color:var(--green);}
 .status-badge.late{background:rgba(245,166,35,0.12);color:#f5a623;}
 .status-badge.missing{background:rgba(240,68,68,0.12);color:#f87171;}
-/* Responsive */
-@media (max-width: 700px) {
-  .metrics { grid-template-columns: repeat(2, 1fr); }
-  .chart-grid { grid-template-columns: 1fr; }
-}
+@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr);}.chart-grid{grid-template-columns:1fr;}.status-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="header-left">
+  <div style="display:flex;align-items:center;gap:12px;">
     <div class="logo">Viamedia SSP Daily Dash</div>
     <div class="data-badge"><span class="dot"></span> Live data</div>
   </div>
-  <div class="header-right mono" id="asof"></div>
+  <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace" id="asof">Loading...</div>
 </div>
-
 <div class="tabs" id="tabBar"></div>
-<div id="tabContents"></div>
-
+<div id="tabContents"><div class="loading">Loading dashboard data...</div></div>
 <script>
-const DATA_URL='https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json';
-async function init(){try{const r=await fetch(DATA_URL+'?t='+Date.now());const d=await r.json();document.getElementById('asof').textContent='Through '+d.max_date+' \u00b7 Updated '+d.generated_at;const m=document.querySelector('#page-Overview .metrics');if(m)m.innerHTML='<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$'+Math.round(d.total_spend).toLocaleString()+'</div><div class="mc-sub">All platforms</div></div><div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">'+d.active_deals+'</div><div class="mc-sub">Spend in last 7 days</div></div><div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">'+d.flagged_deals+'</div><div class="mc-sub">Stopped or declining</div></div><div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">'+d.opportunity_deals+'</div><div class="mc-sub">Growing week-over-week</div></div>';}catch(e){console.error(e);}}
+const PC={OpenX:"#4f7cff",Equativ:"#3ecf8e","Magnite Curate":"#f5a623","Magnite Streaming":"#c084fc",Xandr:"#fb923c",PubMatic:"#06b6d4"};
+const DATA_URL="https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json";
+const fmt=v=>"$"+Math.round(v).toLocaleString();
+const fmtS=v=>v>=1000?"$"+(v/1000).toFixed(0)+"k":"$"+Math.round(v);
+const shortD=d=>{const p=d.split("-");return p[1].replace(/^0/,"")+"/"+p[2].replace(/^0/,"");};
 
-const PLAT_COLORS = {OpenX:'#4f7cff',Equativ:'#3ecf8e','Magnite Curate':'#f5a623','Magnite Streaming':'#c084fc',Xandr:'#fb923c'};
-const PLAT_TOTALS = {OpenX:130863,Equativ:50151,'Magnite Curate':1727,'Magnite Streaming':7336,Xandr:703};
-const DATES = ["2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-14","2026-03-15","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-03","2026-04-04","2026-04-05","2026-04-06","2026-04-07","2026-04-08"];
-const SERIES = {OpenX:[2528.85,2073.96,2277.23,2305.58,2182.81,2405.29,1903.97,2204.29,1804.35,1837.2,1774.84,1652.99,2046.79,1956.78,2295.35,2366.47,2616.21,3184.75,4313.16,5381.71,5565.27,3177.46,6012.89,8104.48,7678.58,7054.22,7760.01,7351.94,7555.64,271.49],Equativ:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50150.91],"Magnite Curate":[72.88,57.8,58.82,76.43,57.18,65.04,50.53,54.29,63.26,52.69,53.09,52.84,55.08,55.68,58.55,56.54,56.84,69.33,53.77,67.13,51.13,54.4,49.5,46.98,50.39,42.79,47.33,94.06,48.41,0],"Magnite Streaming":[507.53,399.55,355.11,294.89,244.24,287.59,262.48,352.95,297.47,320.11,310.11,225.96,280.63,256.31,238.47,172.96,174.5,166.22,138.79,181.19,144.99,120.42,290.51,234.15,231.09,187.01,193.52,174.31,264.69,28.66],Xandr:[29.98,18.67,15.75,16.01,12.39,14.01,15.08,17.81,13.31,13.82,16.54,13.99,23.09,15.43,16.23,16.53,28.64,26.91,23.32,28.89,36.04,37.74,38.8,25.0,23.31,47.82,33.84,24.81,35.92,0]};
-
-const SELLER_DATA={};
-
-const fmt = v => '$' + Math.round(v).toLocaleString();
-const fmtS = v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'k' : '$' + Math.round(v);
-const shortD = d => { const p = d.split('-'); return p[1].replace(/^0/,'') + '/' + p[2].replace(/^0/,''); };
-
-
-fetch('https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json?t='+Date.now())
-  .then(r=>r.json()).then(d=>{
-    document.getElementById('asof').textContent='Through '+d.max_date+' · Updated '+d.generated_at;
-    const m=document.querySelector('#page-Overview .metrics');
-    if(m) m.innerHTML='<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$'+Math.round(d.total_spend).toLocaleString()+'</div><div class="mc-sub">All platforms</div></div><div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">'+d.active_deals+'</div><div class="mc-sub">Spend in last 7 days</div></div><div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">'+d.flagged_deals+'</div><div class="mc-sub">Stopped or declining</div></div><div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">'+d.opportunity_deals+'</div><div class="mc-sub">Growing week-over-week</div></div>';
-  }).catch(e=>console.error(e));
-
-
-const SELLERS = ['Overview','Yelena','Matt','Ken','Allison','Dan','Meghan','Allegra','Jordana','Unassigned'];
-const tabBar = document.getElementById('tabBar');
-const tabContents = document.getElementById('tabContents');
-
-SELLERS.forEach(name => {
-  const btn = document.createElement('button');
-  btn.className = 'tab' + (name === 'Overview' ? ' active' : '');
-  btn.textContent = name;
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('page-' + name).classList.add('active');
-  });
-  tabBar.appendChild(btn);
-});
-
-function trendStr(t) {
-  if (t === null || t === undefined) return '<span class="tn">—</span>';
-  if (Math.abs(t) > 5000) return '<span class="tu">new</span>';
-  const s = t >= 0 ? '+' : '';
-  return `<span class="${t > 0 ? 'tu' : 'td'}">${s}${Math.round(t)}%</span>`;
-}
-
-function buildTable(deals, id) {
-  let fState = 'all', sState = '';
-  const wrap = document.createElement('div');
-  const fb = document.createElement('div');
-  fb.className = 'filter-bar';
-  ['all','stopped','declining','growing'].forEach(f => {
-    const b = document.createElement('button');
-    b.className = 'fb' + (f === 'all' ? ' active' : '');
-    b.textContent = f === 'all' ? 'All deals' : f.charAt(0).toUpperCase() + f.slice(1);
-    b.addEventListener('click', () => {
-      fb.querySelectorAll('.fb').forEach(x => x.classList.remove('active'));
-      b.classList.add('active'); fState = f; render();
-    });
-    fb.appendChild(b);
-  });
-  const sw = document.createElement('div'); sw.className = 'search-wrap';
-  sw.innerHTML = '<input type="text" placeholder="Search deal or platform...">';
-  sw.querySelector('input').addEventListener('input', e => { sState = e.target.value; render(); });
-  fb.appendChild(sw);
-  wrap.appendChild(fb);
-
-  const tw = document.createElement('div'); tw.className = 'tbl-wrap';
-  tw.innerHTML = `<table id="${id}"><thead><tr>
-    <th style="width:32%">Deal name</th>
-    <th style="width:10%">Platform</th>
-    <th style="width:10%;text-align:right">Total spend</th>
-    <th style="width:9%;text-align:right">Last 7d</th>
-    <th style="width:9%;text-align:right">Prior 7d</th>
-    <th style="width:7%;text-align:right">Trend</th>
-    <th style="width:7%">Status</th>
-    <th style="width:16%">Latest note</th>
-  </tr></thead><tbody></tbody></table>
-  <div class="no-r" style="display:none">No deals match.</div>`;
-  wrap.appendChild(tw);
-  const tbody = tw.querySelector('tbody');
-  const noR = tw.querySelector('.no-r');
-
-  function render() {
-    const filtered = deals.filter(d => {
-      const fm = fState === 'all' || d.flag === fState;
-      const q = sState.toLowerCase();
-      const sm = !q || (d.name||'').toLowerCase().includes(q) || (d.platforms||[]).join(' ').toLowerCase().includes(q);
-      return fm && sm;
-    });
-    if (!filtered.length) { tbody.innerHTML = ''; noR.style.display = 'block'; return; }
-    noR.style.display = 'none';
-    tbody.innerHTML = filtered.map((d,i) => {
-      const pts = (d.platforms||[]).map(p => `<span class="pt">${p.replace('Magnite ','Mag.')}</span>`).join('');
-      const opt = d.opt || d.notes;
-      const optTxt = opt ? opt.substring(0,42) + (opt.length > 42 ? '…' : '') : '<span style="color:var(--text3)">—</span>';
-      return `<tr data-i="${i}" style="cursor:pointer">
-        <td class="dn" title="${d.name}">${d.name}</td>
-        <td>${pts}</td>
-        <td style="text-align:right;font-family:'DM Mono',monospace">${fmt(d.total)}</td>
-        <td style="text-align:right;font-family:'DM Mono',monospace">${fmt(d.last7)}</td>
-        <td style="text-align:right;font-family:'DM Mono',monospace">${fmt(d.prior7)}</td>
-        <td style="text-align:right">${trendStr(d.trend)}</td>
-        <td><span class="badge b-${d.flag}">${d.flag}</span></td>
-        <td style="font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0" title="${opt||''}">${optTxt}</td>
-      </tr>`;
-    }).join('');
-    tbody.querySelectorAll('tr').forEach((row, i) => {
-      row.addEventListener('click', () => {
-        const next = row.nextSibling;
-        if (next && next.classList && next.classList.contains('dr')) { next.remove(); return; }
-        const d = filtered[i];
-        const tr = document.createElement('tr'); tr.className = 'dr';
-        const opt = d.opt || '<span class="dv-empty">None recorded</span>';
-        const notes = d.notes || '<span class="dv-empty">None recorded</span>';
-        tr.innerHTML = `<td colspan="8"><div class="di">
-          <div><div class="dl">Latest optimization</div><div class="dv">${opt}</div>${d.week ? `<div class="dv-week">Week of ${d.week}</div>` : ''}</div>
-          <div><div class="dl">Status notes</div><div class="dv">${notes}</div>
-            <div class="dmeta">
-              <div class="dmeta-item"><div class="dl">Last 7d</div><div class="dv mono">${fmt(d.last7)}</div></div>
-              <div class="dmeta-item"><div class="dl">Prior 7d</div><div class="dv mono">${fmt(d.prior7)}</div></div>
-              <div class="dmeta-item"><div class="dl">Days since active</div><div class="dv mono">${d.days}</div></div>
-            </div>
-          </div>
-        </div></td>`;
-        row.after(tr);
-      });
-    });
+async function init(){
+  try{
+    const r=await fetch(DATA_URL+"?t="+Date.now());
+    const d=await r.json();
+    document.getElementById("asof").textContent="Through "+d.max_date+" · Updated "+d.generated_at;
+    buildUI(d);
+  }catch(e){
+    document.getElementById("asof").textContent="Error loading data: "+e.message;
+    document.getElementById("tabContents").innerHTML='<div class="loading">Failed to load. Please refresh.</div>';
   }
-  render();
-  return wrap;
 }
 
-function buildFlagBar(flags) {
-  const bar = document.createElement('div'); bar.className = 'flag-row';
-  ['stopped','declining','growing','stable'].forEach(f => {
-    const n = flags[f] || 0; if (!n) return;
-    bar.innerHTML += `<div class="fc fc-${f}"><div class="fc-num">${n}</div><div class="fc-lbl">${f}</div></div>`;
+function trendStr(t){
+  if(t===null||t===undefined)return'<span class="tn">—</span>';
+  if(Math.abs(t)>5000)return'<span class="tu">new</span>';
+  return'<span class="'+(t>0?"tu":"td2")+'">'+(t>=0?"+":"")+Math.round(t)+"%</span>";
+}
+
+function buildFlagBar(flags){
+  const bar=document.createElement("div");bar.className="flag-row";
+  ["stopped","declining","growing","stable"].forEach(f=>{
+    const n=flags[f]||0;if(!n)return;
+    bar.innerHTML+='<div class="fc fc-'+f+'"><div class="fc-num">'+n+'</div><div class="fc-lbl">'+f+'</div></div>';
   });
   return bar;
 }
 
-// Overview tab
-const ovDiv = document.createElement('div');
-ovDiv.id = 'page-Overview'; ovDiv.className = 'page active';
-ovDiv.innerHTML = `
-  <div class="metrics">
-    <div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$190,780</div><div class="mc-sub">All platforms combined</div></div>
-    <div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">56</div><div class="mc-sub">Spend in last 7 days</div></div>
-    <div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">20</div><div class="mc-sub">Stopped or declining</div></div>
-    <div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">18</div><div class="mc-sub">Growing week-over-week</div></div>
-  </div>
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-title">Daily spend by platform — last 30 days</div>
-      <div class="chart-wrap"><canvas id="trendChart" role="img" aria-label="Daily spend trend by platform">Spend trend chart.</canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Platform breakdown</div>
-      <div class="legend" id="legend"></div>
-      <div class="plat-bars" id="platBars"></div>
-    </div>
-  </div>
-  <div class="sec">Deal status</div>`;
-
-
-// Report status section
-fetch('https://raw.githubusercontent.com/petehiltonjr/VM-SSP-Daily-Dash/main/dashboard_data.json?t='+Date.now())
-  .then(r=>r.json()).then(d=>{
-    const rs = d.report_status || {};
-    const sources = ['OpenX','Equativ','Magnite Curate','Magnite Streaming','Xandr','PubMatic'];
-    const container = document.querySelector('#page-Overview');
-    if(!container) return;
-    const rsDiv = document.createElement('div');
-    rsDiv.style.cssText = 'margin-bottom:20px;';
-    const title = document.createElement('div');
-    title.className = 'sec';
-    title.textContent = 'Daily report status';
-    rsDiv.appendChild(title);
-    const grid = document.createElement('div');
-    grid.className = 'status-grid';
-    sources.forEach(src => {
-      const info = rs[src] || {status:'MISSING',last_received:'Never'};
-      const st = info.status.toLowerCase();
-      const card = document.createElement('div');
-      card.className = 'status-card ' + st;
-      card.innerHTML = '<div class="status-dot '+st+'"></div><div><div class="status-name">'+src+'</div><div class="status-date">Last: '+info.last_received+'</div></div><span class="status-badge '+st+'">'+info.status+'</span>';
-      grid.appendChild(card);
+function buildTable(deals,id){
+  let fState="all",sState="";
+  const wrap=document.createElement("div");
+  const fb=document.createElement("div");fb.className="filter-bar";
+  ["all","stopped","declining","growing"].forEach(f=>{
+    const b=document.createElement("button");
+    b.className="fb"+(f==="all"?" active":"");
+    b.textContent=f==="all"?"All deals":f[0].toUpperCase()+f.slice(1);
+    b.addEventListener("click",()=>{fb.querySelectorAll(".fb").forEach(x=>x.classList.remove("active"));b.classList.add("active");fState=f;render();});
+    fb.appendChild(b);
+  });
+  const sw=document.createElement("div");sw.className="search-wrap";
+  sw.innerHTML='<input type="text" placeholder="Search deal or platform...">';
+  sw.querySelector("input").addEventListener("input",e=>{sState=e.target.value;render();});
+  fb.appendChild(sw);wrap.appendChild(fb);
+  const tw=document.createElement("div");tw.className="tbl-wrap";
+  tw.innerHTML='<table id="'+id+'"><thead><tr><th style="width:32%">Deal name</th><th style="width:10%">Platform</th><th style="width:10%;text-align:right">Total spend</th><th style="width:9%;text-align:right">Last 7d</th><th style="width:9%;text-align:right">Prior 7d</th><th style="width:7%;text-align:right">Trend</th><th style="width:7%">Status</th><th style="width:16%">Latest note</th></tr></thead><tbody></tbody></table><div class="no-r" style="display:none">No deals match.</div>';
+  wrap.appendChild(tw);
+  const tbody=tw.querySelector("tbody");
+  const noR=tw.querySelector(".no-r");
+  function render(){
+    const filtered=deals.filter(x=>{
+      const fm=fState==="all"||x.flag===fState;
+      const q=sState.toLowerCase();
+      const sm=!q||(x.name||"").toLowerCase().includes(q)||(x.platforms||[]).join(" ").toLowerCase().includes(q)||(x.seller||"").toLowerCase().includes(q);
+      return fm&&sm;
     });
-    rsDiv.appendChild(grid);
-    container.insertBefore(rsDiv, container.firstChild);
-  }).catch(e=>console.error(e));
-
-const allDeals = Object.values(SELLER_DATA).flatMap(s => s.deals);
-const allFlags = {};
-allDeals.forEach(d => { allFlags[d.flag] = (allFlags[d.flag]||0)+1; });
-ovDiv.appendChild(buildFlagBar(allFlags));
-const sec2 = document.createElement('div'); sec2.className = 'sec'; sec2.style.marginTop = '16px'; sec2.textContent = 'All deals';
-ovDiv.appendChild(sec2);
-ovDiv.appendChild(buildTable(allDeals.sort((a,b)=>b.total-a.total), 'tbl-overview'));
-tabContents.appendChild(ovDiv);
-
-// Seller tabs
-SELLERS.filter(s => s !== 'Overview').forEach(seller => {
-  const sd = SELLER_DATA[seller];
-  const div = document.createElement('div');
-  div.id = 'page-' + seller; div.className = 'page';
-  const trend = sd.prior7 > 0 ? ((sd.last7 - sd.prior7)/sd.prior7*100) : null;
-  const trendHtml = trend !== null ? `<span style="color:${trend>=0?'var(--green)':'var(--red)'};">${trend>=0?'+':''}${Math.round(trend)}% vs prior week</span>` : '';
-  div.innerHTML = `
-    <div class="seller-header">
-      <div class="seller-name">${seller}</div>
-      <div class="seller-meta"><span>${sd.deals.length} deals</span> · <span class="mono">${fmt(sd.total)}</span> total spend · ${trendHtml}</div>
-    </div>
-    <div class="metrics-3">
-      <div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">${fmt(sd.total)}</div></div>
-      <div class="mc"><div class="mc-label">Last 7 days</div><div class="mc-val mono">${fmt(sd.last7)}</div></div>
-      <div class="mc"><div class="mc-label">Prior 7 days</div><div class="mc-val mono">${fmt(sd.prior7)}</div></div>
-    </div>`;
-  div.appendChild(buildFlagBar(sd.flags));
-  const sec = document.createElement('div'); sec.className = 'sec'; sec.style.marginTop = '16px'; sec.textContent = 'Deals';
-  div.appendChild(sec);
-  div.appendChild(buildTable(sd.deals.sort((a,b)=>b.total-a.total), 'tbl-'+seller));
-  tabContents.appendChild(div);
-});
-
-// Chart
-const labels = DATES.map(shortD);
-const datasets = Object.entries(SERIES).map(([name, data]) => ({
-  label: name, data, borderColor: PLAT_COLORS[name],
-  borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false,
-  borderDash: name === 'Equativ' ? [4,3] : undefined
-}));
-new Chart(document.getElementById('trendChart'), {
-  type: 'line', data: { labels, datasets },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { display: false }, tooltip: {
-      backgroundColor: '#1e2130', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-      titleColor: '#8b90a0', bodyColor: '#e8eaf0', titleFont: { size: 10 },
-      callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) }
-    }},
-    scales: {
-      x: { ticks: { font: { size: 9, family: 'DM Mono' }, color: '#555b6e', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.03)' } },
-      y: { ticks: { font: { size: 9, family: 'DM Mono' }, color: '#555b6e', callback: v => fmtS(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
-    }
+    if(!filtered.length){tbody.innerHTML="";noR.style.display="block";return;}
+    noR.style.display="none";
+    tbody.innerHTML=filtered.map((x,i)=>{
+      const pts=(x.platforms||[]).map(p=>'<span class="pt">'+p.replace("Magnite ","Mag.")+"</span>").join("");
+      const opt=x.opt||x.notes;
+      const optTxt=opt?opt.substring(0,42)+(opt.length>42?"…":""):'<span style="color:var(--text3)">—</span>';
+      return'<tr data-i="'+i+'" style="cursor:pointer"><td class="dn" title="'+x.name+'">'+x.name+'</td><td>'+pts+'</td><td style="text-align:right;font-family:\'DM Mono\',monospace">'+fmt(x.total)+'</td><td style="text-align:right;font-family:\'DM Mono\',monospace">'+fmt(x.last7)+'</td><td style="text-align:right;font-family:\'DM Mono\',monospace">'+fmt(x.prior7)+'</td><td style="text-align:right">'+trendStr(x.trend)+'</td><td><span class="badge b-'+x.flag+'">'+x.flag+'</span></td><td style="font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0" title="'+(opt||"")+'">'+optTxt+'</td></tr>';
+    }).join("");
+    tbody.querySelectorAll("tr").forEach((row,i)=>{
+      row.addEventListener("click",()=>{
+        const next=row.nextSibling;
+        if(next&&next.classList&&next.classList.contains("dr")){next.remove();return;}
+        const x=filtered[i];
+        const tr=document.createElement("tr");tr.className="dr";
+        tr.innerHTML='<td colspan="8"><div class="di"><div><div class="dl">Latest optimization</div><div class="dv">'+(x.opt||'<span class="dv-empty">None recorded</span>')+'</div>'+(x.week?'<div class="dv-week">Week of '+x.week+"</div>":"")+'</div><div><div class="dl">Status notes</div><div class="dv">'+(x.notes||'<span class="dv-empty">None recorded</span>')+'</div><div class="dmeta"><div><div class="dl">Last 7d</div><div class="dv mono">'+fmt(x.last7)+'</div></div><div><div class="dl">Prior 7d</div><div class="dv mono">'+fmt(x.prior7)+'</div></div></div></div></div></td>';
+        row.after(tr);
+      });
+    });
   }
-});
+  render();return wrap;
+}
 
-const leg = document.getElementById('legend');
-Object.entries(PLAT_COLORS).forEach(([name, color]) => {
-  leg.innerHTML += `<div class="leg"><span class="leg-dot" style="background:${color}"></span>${name}</div>`;
-});
+function buildUI(d){
+  const tabBar=document.getElementById("tabBar");
+  const tabContents=document.getElementById("tabContents");
+  tabContents.innerHTML="";
+  const SD=d.seller_summary||{};
+  const SELLERS=["Overview",...Object.keys(SD)];
 
-const maxT = Math.max(...Object.values(PLAT_TOTALS));
-const pb = document.getElementById('platBars');
-Object.entries(PLAT_TOTALS).sort((a,b)=>b[1]-a[1]).forEach(([name, val]) => {
-  pb.innerHTML += `<div class="pb-row">
-    <div class="pb-top"><span>${name}</span><span class="mono">${fmtS(val)}</span></div>
-    <div class="pb-bg"><div class="pb-fill" style="width:${Math.round(val/maxT*100)}%;background:${PLAT_COLORS[name]}"></div></div>
-  </div>`;
-});
+  SELLERS.forEach(name=>{
+    const btn=document.createElement("button");
+    btn.className="tab"+(name==="Overview"?" active":"");
+    btn.textContent=name;
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll(".page").forEach(t=>t.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("page-"+name).classList.add("active");
+    });
+    tabBar.appendChild(btn);
+  });
+
+  // Overview
+  const ov=document.createElement("div");
+  ov.id="page-Overview";ov.className="page active";
+
+  // Report status
+  const rs=d.report_status||{};
+  const sources=["OpenX","Equativ","Magnite Curate","Magnite Streaming","Xandr","PubMatic"];
+  let statusHTML='<div class="sec" style="margin-bottom:8px">Daily report status</div><div class="status-grid">';
+  sources.forEach(src=>{
+    const info=rs[src]||{status:"MISSING",last_received:"Never"};
+    const st=info.status.toLowerCase();
+    statusHTML+='<div class="status-card '+st+'"><div class="status-dot '+st+'"></div><div><div class="status-name">'+src+'</div><div class="status-date">Last: '+info.last_received+'</div></div><span class="status-badge '+st+'">'+info.status+'</span></div>';
+  });
+  statusHTML+='</div>';
+
+  ov.innerHTML=statusHTML+
+    '<div class="metrics">'+
+    '<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">$'+Math.round(d.total_spend).toLocaleString()+'</div><div class="mc-sub">All platforms</div></div>'+
+    '<div class="mc"><div class="mc-label">Active deals</div><div class="mc-val mono">'+d.active_deals+'</div><div class="mc-sub">Spend in last 7 days</div></div>'+
+    '<div class="mc"><div class="mc-label">Needs attention</div><div class="mc-val mono danger">'+d.flagged_deals+'</div><div class="mc-sub">Stopped or declining</div></div>'+
+    '<div class="mc"><div class="mc-label">Opportunities</div><div class="mc-val mono success">'+d.opportunity_deals+'</div><div class="mc-sub">Growing week-over-week</div></div>'+
+    '</div>'+
+    '<div class="chart-grid">'+
+    '<div class="chart-card"><div class="chart-title">Daily spend by platform — last 30 days</div><div class="chart-wrap"><canvas id="trendChart" role="img" aria-label="Spend trend">Spend trend.</canvas></div></div>'+
+    '<div class="chart-card"><div class="chart-title">Platform breakdown</div><div class="legend" id="legend"></div><div class="plat-bars" id="platBars"></div></div>'+
+    '</div>'+
+    '<div class="sec">Deal status</div>';
+
+  const allDeals=d.deals||[];
+  const allFlags={};
+  allDeals.forEach(x=>{allFlags[x.flag]=(allFlags[x.flag]||0)+1;});
+  ov.appendChild(buildFlagBar(allFlags));
+  const s2=document.createElement("div");s2.className="sec";s2.style.marginTop="16px";s2.textContent="All deals";
+  ov.appendChild(s2);
+  ov.appendChild(buildTable(allDeals.sort((a,b)=>b.total-a.total),"tbl-overview"));
+  tabContents.appendChild(ov);
+
+  // Seller tabs
+  Object.keys(SD).forEach(seller=>{
+    const sd=SD[seller];
+    const div=document.createElement("div");
+    div.id="page-"+seller;div.className="page";
+    const trend=sd.prior7>0?((sd.last7-sd.prior7)/sd.prior7*100):null;
+    const trendHtml=trend!==null?'<span style="color:'+(trend>=0?"var(--green)":"var(--red)")+';">'+(trend>=0?"+":"")+Math.round(trend)+"% vs prior week</span>":"";
+    div.innerHTML='<div class="seller-header"><div class="seller-name">'+seller+'</div><div class="seller-meta"><span>'+(sd.deals||[]).length+' deals</span> · <span class="mono">'+fmt(sd.total)+'</span> · '+trendHtml+'</div></div>'+
+      '<div class="metrics-3">'+
+      '<div class="mc"><div class="mc-label">Total spend (YTD)</div><div class="mc-val mono">'+fmt(sd.total)+'</div></div>'+
+      '<div class="mc"><div class="mc-label">Last 7 days</div><div class="mc-val mono">'+fmt(sd.last7)+'</div></div>'+
+      '<div class="mc"><div class="mc-label">Prior 7 days</div><div class="mc-val mono">'+fmt(sd.prior7)+'</div></div>'+
+      '</div>';
+    div.appendChild(buildFlagBar(sd.flags||{}));
+    const sec=document.createElement("div");sec.className="sec";sec.style.marginTop="16px";sec.textContent="Deals";
+    div.appendChild(sec);
+    div.appendChild(buildTable((sd.deals||[]).sort((a,b)=>b.total-a.total),"tbl-"+seller));
+    tabContents.appendChild(div);
+  });
+
+  // Chart
+  const DATES=d.dates||[];
+  const SERIES=d.daily_series||{};
+  const PT=d.plat_totals||{};
+  const labels=DATES.map(shortD);
+  const datasets=Object.entries(SERIES).map(([name,data])=>({
+    label:name,data,borderColor:PC[name]||"#888",borderWidth:1.5,pointRadius:0,tension:0.3,fill:false,
+    borderDash:name==="Equativ"?[4,3]:undefined
+  }));
+  new Chart(document.getElementById("trendChart"),{
+    type:"line",data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:"index",intersect:false},
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:"#1e2130",borderColor:"rgba(255,255,255,0.1)",borderWidth:1,
+        titleColor:"#8b90a0",bodyColor:"#e8eaf0",titleFont:{size:10},
+        callbacks:{label:ctx=>" "+ctx.dataset.label+": "+fmt(ctx.parsed.y)}
+      }},
+      scales:{
+        x:{ticks:{font:{size:9,family:"DM Mono"},color:"#555b6e",maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{color:"rgba(255,255,255,0.03)"}},
+        y:{ticks:{font:{size:9,family:"DM Mono"},color:"#555b6e",callback:v=>fmtS(v)},grid:{color:"rgba(255,255,255,0.05)"}}
+      }
+    }
+  });
+
+  const leg=document.getElementById("legend");
+  Object.entries(PC).forEach(([name,color])=>{
+    leg.innerHTML+='<div class="leg"><span class="leg-dot" style="background:'+color+'"></span>'+name+'</div>';
+  });
+  const vals=Object.values(PT).filter(v=>v>0);
+  const maxT=vals.length?Math.max(...vals):1;
+  const pb=document.getElementById("platBars");
+  Object.entries(PT).sort((a,b)=>b[1]-a[1]).forEach(([name,val])=>{
+    pb.innerHTML+='<div><div class="pb-top"><span>'+name+'</span><span class="mono">'+fmtS(val)+'</span></div><div class="pb-bg"><div class="pb-fill" style="width:'+Math.round(val/maxT*100)+'%;background:'+(PC[name]||"#888")+'"></div></div></div>';
+  });
+}
+
+init();
 </script>
 </body>
 </html>
